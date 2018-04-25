@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="deaths.js"></script>
-    <script src="damage.js"></script>
   </head>
 
   <div class="row">
@@ -80,32 +79,16 @@
           <input type="checkbox" id="Tsunami" class ="DeathChecks" checked></input>
           )
         </label>
+
+      </p>
+      <p onmouseup="updateDeathCsv()">
+        <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
+          <input type="range" min="0" max="500" value="15" id="deathSlider">
+          <div id="deathOutput"></div>
+        </div>
       </p>
     </div>
 		<script src ="deaths.js"></script>
   </div>
-  <body>
-    <h1>Most Property Damage per Storm Event</h1>
-    <div class="DamageChart"></div>
-		<div class="DamageEquation"></div>
-		<div class="DamageOutlierEquation"></div>
-    <div>
-      <p id="checkbox" onclick="myFunction()">
-        <label>
-          Tornado
-          <input type="checkbox" id="Tornado" checked></input>
-        </label>
-        <label>
-          Thunderstorm
-          <input type="checkbox" id="Thunderstorm" checked></input>
-        </label>
-        <label>
-          Hurricane
-          <input type="checkbox" id="Hurricane" checked></input>
-        </label>
-      </p>
-    </div>
-		<script src ="damage.js"></script>
-  </body>
 
 </html>

@@ -1,6 +1,6 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 5, bottom: 20, left: 100},
+    var margin = {top: 5, right: 5, bottom: 50, left: 100},
 	     width = 450 - margin.left - margin.right,
 	     height = 450 - margin.top - margin.bottom;
 
@@ -23,11 +23,15 @@
 	      .scale(y);
 
     var deathData;
+    var deathThreshold;
 
     function updateDeathCsv() {
       // .value = "on" is checked
       // .id = weather event
       SelectedWeatherEvents = []
+
+      deathThreshold = deathSlider.value;
+      deathOutput.innerHTML = deathSlider.value;
 
       var a = document.getElementsByClassName("DeathChecks")
                 ;//.filter(function(element) {return element.checked == true});
@@ -42,18 +46,16 @@
         return SelectedWeatherEvents.includes(element.EVENT_TYPE)
       });
 
-      console.log(a)
-      console.log(SelectedWeatherEvents)
-      console.log(UsedData)
 
       y.domain(d3.extent(UsedData, function(d){ return d.DEATHS}));
-      x.domain(d3.extent(UsedData, function(d){ return d.YEAR}));
+      x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
 
-      outlierData = UsedData.filter(function(element) {return element.DEATHS > 50});
+      outlierData = UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
 
       // see below for an explanation of the calcLinear function
-      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.YEAR}), d3.max(UsedData, function(d){ return d.YEAR}));
-      var lg2 = calcLinear(outlierData, "x", "y", d3.min(outlierData, function(d){ return d.YEAR}), d3.max(outlierData, function(d){ return d.YEAR}));
+      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
+      var lg2 = calcLinear(outlierData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
+      console.log(lg2)
 
       svg.selectAll("*").remove();
 
@@ -88,19 +90,39 @@
 
       svg.selectAll(".point")
           .data(UsedData)
-        .enter().append("circle")
+          .enter().append("circle")
           .attr("class", "point")
           .attr("r", 3)
           .attr("cy", function(d){ return y(d.DEATHS); })
-          .attr("cx", function(d){ return x(d.YEAR); })
+          .attr("cx", function(d){ return x(d.TAVG); })
           .style("opacity", .5)
           .style("fill", "blue");
+
+          svg.append("text")
+                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+                .attr("transform", "translate("+ -40 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+                .text("Deaths");
+
+            svg.append("text")
+                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+                .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
+                .text("Average Temperature");
+    };
+
+    function updateSlider() {
+      deathOutput.innerHTML = deathSlider.value;
     };
 
 	  d3.tsv("deaths.tsv", types, function(error, data){
-
+      data.forEach(function(d) {
+        d.TAVG = parseFloat(d.TAVG);
+      });
       deathData = data;
+      var deathSlider = document.getElementById("deathSlider");
+      var deathOutput = document.getElementById("deathOutput");
+      deathOutput.innerHTML = deathSlider.value;
       updateDeathCsv();
+
 
 	  });
 
@@ -138,53 +160,30 @@
         var obj = {};
         obj.x = d[x];
         obj.y = d[y];
-        obj.mult = obj.x*obj.y;
+        obj.xy = obj.x*obj.y;
         pts.push(obj);
       });
 
-      // Let a equal n times the summation of all x-values multiplied by their corresponding y-values
-      // Let b equal the sum of all x-values times the sum of all y-values
-      // Let c equal n times the sum of all squared x-values
-      // Let d equal the squared sum of all x-values
-      var sum = 0;
-      var xSum = 0;
-      var ySum = 0;
-      var sumSq = 0;
-      pts.forEach(function(pt){
-        sum = sum + pt.mult;
-        xSum = xSum + pt.x;
-        ySum = ySum + pt.y;
-        sumSq = sumSq + (pt.x * pt.x);
-      });
-      var a = sum * n;
-      var b = xSum * ySum;
-      var c = sumSq * n;
-      var d = xSum * xSum;
-
-      // Plug the values that you calculated for a, b, c, and d into the following equation to calculate the slope
-      // slope = m = (a - b) / (c - d)
-      var m = (a - b) / (c - d);
-
-      /////////////
-      //INTERCEPT//
-      /////////////
-
-      // Let e equal the sum of all y-values
-      var e = ySum;
-
-      // Let f equal the slope times the sum of all x-values
-      var f = m * xSum;
-
-      // Plug the values you have calculated for e and f into the following equation for the y-intercept
-      // y-intercept = b = (e - f) / n
-      var b = (e - f) / n;
-
 			// Print the equation below the chart
-			document.getElementsByClassName("DeathEquation").innerHTML = "y = " + m + "x + " + b;
+			//document.getElementsByClassName("DeathEquation").innerHTML = "y = " + m + "x + " + b;
 			//document.getElementsByClassName("equation")[1].innerHTML = "x = ( y - " + b + " ) / " + m;
 
-      minX = parseFloat(minX)
-      maxX = parseFloat(maxX)
+      var xysum = 0;
+      var xsum = 0;
+      var ysum = 0;
+      var xsumSq = 0;
+      pts.forEach(function(pt){
+        xysum = xysum + pt.xy;
+        xsum = xsum + pt.x;
+        ysum = ysum + pt.y;
+        xsumSq = xsumSq + (pt.x * pt.x);
+      });
+
+      var b = (n*xysum - xsum*ysum)/(n*xsumSq - xsumSq);
+      var m = (ysum/n) - b*(xsum/n);
+
+      console.log(m)
+      console.log(b)
 
       // return an object of two points
       // each point is an object with an x and y coordinate
@@ -194,8 +193,8 @@
           y: m * minX + b
         },
         ptB : {
-          y: m * maxX + b,
-          x: maxX
+          x: maxX,
+          y: m * maxX + b
         }
       }
 

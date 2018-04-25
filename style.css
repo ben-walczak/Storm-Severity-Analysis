@@ -1,1 +1,16 @@
 /* Styles go here */
+<style type="text/css">
+
+			.axis path,
+			.axis line {
+				fill: none;
+				stroke: black;
+				shape-rendering: crispEdges;
+			}
+
+			.axis text {
+				font-family: Garamond;
+				font-size: 13px;
+			}
+
+	</style>
