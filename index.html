@@ -7,84 +7,78 @@
     <script src="deaths.js"></script>
   </head>
 
-  <div class="row">
+
+  <div style="width: 100%; overflow: hidden;">
+    <div style="width: 600px; float: left;">
     <h1>Most Deaths per Storm Event</h1>
     <div class="DeathChart"></div>
 		<div class="DeathEquation"></div>
 		<div class="DeathOutlierEquation"></div>
-    <div class="row">
+  </div>
+    <div style="margin-top: 100px;">
       <p onclick="updateDeathCsv()">
         <label>
-          (Tornado
           <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Tornado
+        </label><br>
         <label>
-          (Hail
-          <input type="checkbox" id="Hail" class ="DeathChecks" checked></input>
-          )
-        </label>
-        <label>
-          (Thunderstorm
           <input type="checkbox" id="Thunderstorm" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Thunderstorm
+        </label><br>
         <label>
-          (Winter Storm
+          <input type="checkbox" id="Hail" class ="DeathChecks" checked></input>
+          Hail
+        </label><br>
+        <label>
           <input type="checkbox" id="Winter Storm" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Winter Storm
+        </label><br>
         <label>
-          (Flood
-          <input type="checkbox" id="Flood" class ="DeathChecks" checked></input>
-          )
-        </label>
-        <label>
-          (High Wind
           <input type="checkbox" id="High Wind" class ="DeathChecks" checked></input>
-          )
-        </label>
+          High Wind
+        </label><br>
         <label>
-          (Other
-          <input type="checkbox" id="Other" class ="DeathChecks" checked></input>
-          )
-        </label>
-        <label>
-          (Wildfire
           <input type="checkbox" id="Wildfire" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Wildfire
+        </label><br>
         <label>
-          (Drought
+          <input type="checkbox" id="Flood" class ="DeathChecks" checked></input>
+          Flood
+        </label><br>
+        <label>
           <input type="checkbox" id="Drought" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Drought
+        </label><br>
         <label>
-          (Heat
           <input type="checkbox" id="Heat" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Heat
+        </label><br>
         <label>
-          (Tropical Storm
           <input type="checkbox" id="Tropical Storm" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Tropical Storm
+        </label><br>
         <label>
-          (Hurricane
           <input type="checkbox" id="Hurricane" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Hurricane
+        </label><br>
         <label>
-          (Tsunami
           <input type="checkbox" id="Tsunami" class ="DeathChecks" checked></input>
-          )
-        </label>
+          Tsunami
+        </label><br>
+        <label>
+          <input type="checkbox" id="Other" class ="DeathChecks" checked></input>
+          Other
+        </label><br>
 
       </p>
       <p onmouseup="updateDeathCsv()">
         <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
           <input type="range" min="0" max="500" value="15" id="deathSlider">
           <div id="deathOutput"></div>
+        <form>
+          <input type="radio" class="equality" value=">" checked="checked">>
+          <input type="radio" class="equality" value="<"><
+        </form>
         </div>
       </p>
     </div>

@@ -24,6 +24,7 @@
 
     var deathData;
     var deathThreshold;
+    var equality;
 
     function updateDeathCsv() {
       // .value = "on" is checked
@@ -31,14 +32,20 @@
       SelectedWeatherEvents = []
 
       deathThreshold = deathSlider.value;
-      deathOutput.innerHTML = deathSlider.value;
+      deathOutput.innerHTML = "Deaths  "+deathSlider.value;
 
-      var a = document.getElementsByClassName("DeathChecks")
+      var checkboxes = document.getElementsByClassName("DeathChecks");
+      var radiobuttons = document.getElementsByClassName("equality");
                 ;//.filter(function(element) {return element.checked == true});
 
-      for (i= 0; i < a.length; i++) {
-        if (a[i].checked == true)
-            SelectedWeatherEvents.push(a[i].id)
+      for (i= 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].checked == true)
+            SelectedWeatherEvents.push(checkboxes[i].id)
+      }
+
+      for (i= 0; i < radiobuttons.length; i++) {
+        if (radiobuttons[i].checked == true)
+            equality = radiobuttons[i].value;
       }
 
       //SelectedWeatherEvents = ["Tornado","Hurricane"];
@@ -50,7 +57,11 @@
       y.domain(d3.extent(UsedData, function(d){ return d.DEATHS}));
       x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
 
-      outlierData = UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
+      if (equality == ">")
+        outlierData = UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
+      else if (equality == "<") {
+        outlierData = UsedData.filter(function(element) {return element.DEATHS <= deathThreshold});
+      }
 
       // see below for an explanation of the calcLinear function
       var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
@@ -75,7 +86,7 @@
           .attr("x2", x(lg2.ptB.x))
           .attr("y2", y(lg2.ptB.y))
           .attr("stroke-width", 1)
-          .attr("stroke", "red");
+          .attr("stroke", "green");
 
 
 
@@ -110,7 +121,7 @@
     };
 
     function updateSlider() {
-      deathOutput.innerHTML = deathSlider.value;
+      deathOutput.innerHTML = "Deaths > "+deathSlider.value;
     };
 
 	  d3.tsv("deaths.tsv", types, function(error, data){
@@ -120,16 +131,14 @@
       deathData = data;
       var deathSlider = document.getElementById("deathSlider");
       var deathOutput = document.getElementById("deathOutput");
-      deathOutput.innerHTML = deathSlider.value;
+      deathOutput.innerHTML = "Deaths > "+deathSlider.value;
       updateDeathCsv();
-
-
 	  });
 
 
 
 	  function types(d){
-	    d.x = +d.YEAR;
+	    d.x = +d.TAVG;
 	    d.y = +d.DEATHS;
 
 	    return d;
@@ -179,8 +188,8 @@
         xsumSq = xsumSq + (pt.x * pt.x);
       });
 
-      var b = (n*xysum - xsum*ysum)/(n*xsumSq - xsumSq);
-      var m = (ysum/n) - b*(xsum/n);
+      var m = (n*xysum - xsum*ysum)/(n*xsumSq - xsumSq);
+      var b = (ysum/n) - m*(xsum/n);
 
       console.log(m)
       console.log(b)
