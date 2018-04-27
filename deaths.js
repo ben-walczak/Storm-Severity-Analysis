@@ -32,11 +32,10 @@
       SelectedWeatherEvents = []
 
       deathThreshold = deathSlider.value;
-      deathOutput.innerHTML = "Deaths  "+deathSlider.value;
+      deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
 
       var checkboxes = document.getElementsByClassName("DeathChecks");
       var radiobuttons = document.getElementsByClassName("equality");
-                ;//.filter(function(element) {return element.checked == true});
 
       for (i= 0; i < checkboxes.length; i++) {
         if (checkboxes[i].checked == true)
@@ -57,11 +56,7 @@
       y.domain(d3.extent(UsedData, function(d){ return d.DEATHS}));
       x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
 
-      if (equality == ">")
-        outlierData = UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
-      else if (equality == "<") {
-        outlierData = UsedData.filter(function(element) {return element.DEATHS <= deathThreshold});
-      }
+      var outlierData = getOutlierDataGivenEquality();
 
       // see below for an explanation of the calcLinear function
       var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
@@ -69,6 +64,16 @@
       console.log(lg2)
 
       svg.selectAll("*").remove();
+
+      svg.selectAll(".point")
+          .data(UsedData)
+          .enter().append("circle")
+          .attr("class", "point")
+          .attr("r", 3)
+          .attr("cy", function(d){ return y(d.DEATHS); })
+          .attr("cx", function(d){ return x(d.TAVG); })
+          .style("opacity", .5)
+          .style("fill", "blue");
 
       svg.append("line")
           .attr("class", "regression")
@@ -99,15 +104,7 @@
           .attr("class", "y axis")
           .call(yAxis);
 
-      svg.selectAll(".point")
-          .data(UsedData)
-          .enter().append("circle")
-          .attr("class", "point")
-          .attr("r", 3)
-          .attr("cy", function(d){ return y(d.DEATHS); })
-          .attr("cx", function(d){ return x(d.TAVG); })
-          .style("opacity", .5)
-          .style("fill", "blue");
+
 
           svg.append("text")
                 .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
@@ -121,7 +118,7 @@
     };
 
     function updateSlider() {
-      deathOutput.innerHTML = "Deaths > "+deathSlider.value;
+      deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
     };
 
 	  d3.tsv("deaths.tsv", types, function(error, data){
@@ -131,9 +128,25 @@
       deathData = data;
       var deathSlider = document.getElementById("deathSlider");
       var deathOutput = document.getElementById("deathOutput");
-      deathOutput.innerHTML = "Deaths > "+deathSlider.value;
       updateDeathCsv();
 	  });
+
+    function getOutlierDataGivenEquality() {
+      if (equality == ">")
+        return UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
+      else if (equality == "<") {
+        return UsedData.filter(function(element) {return element.DEATHS <= deathThreshold});
+      }
+    };
+
+    function updateEquality() {
+      var radiobuttons = document.getElementsByClassName("equality");
+      for (i= 0; i < radiobuttons.length; i++) {
+        if (radiobuttons[i].checked == true)
+            equality = radiobuttons[i].value;
+      }
+      updateDeathCsv();
+    };
 
 
 

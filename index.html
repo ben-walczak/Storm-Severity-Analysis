@@ -10,13 +10,13 @@
 
   <div style="width: 100%; overflow: hidden;">
     <div style="width: 600px; float: left;">
-    <h1>Most Deaths per Storm Event</h1>
+    <h1 style="margin-left: 70px; text: Garamond;" class="text">Most Deaths per Storm Event</h1>
     <div class="DeathChart"></div>
 		<div class="DeathEquation"></div>
 		<div class="DeathOutlierEquation"></div>
   </div>
     <div style="margin-top: 100px;">
-      <p onclick="updateDeathCsv()">
+      <p onclick="updateDeathCsv()" class="text">
         <label>
           <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
           Tornado
@@ -71,13 +71,13 @@
         </label><br>
 
       </p>
-      <p onmouseup="updateDeathCsv()">
+      <p onmouseup="updateDeathCsv()" class="text">
         <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
           <input type="range" min="0" max="500" value="15" id="deathSlider">
           <div id="deathOutput"></div>
-        <form>
-          <input type="radio" class="equality" value=">" checked="checked">>
-          <input type="radio" class="equality" value="<"><
+        <form onclick="updateEquality()" action="">
+          <input name="equality" type="radio" class="equality" value=">" checked=true>>
+          <input name="equality" type="radio" class="equality" value="<"><
         </form>
         </div>
       </p>
