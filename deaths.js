@@ -58,9 +58,8 @@
 
       var outlierData = getOutlierDataGivenEquality();
 
-      // see below for an explanation of the calcLinear function
-      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
-      var lg2 = calcLinear(outlierData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}));
+      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DeathEquation");
+      var lg2 = calcLinear(outlierData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DeathOutlierEquation");
       console.log(lg2)
 
       svg.selectAll("*").remove();
@@ -157,26 +156,10 @@
 	    return d;
 	  }
 
-    // Calculate a linear regression from the data
+    function calcLinear(data, x, y, minX, maxX, type){
 
-		// Takes 5 parameters:
-    // (1) Your data
-    // (2) The column of data plotted on your x-axis
-    // (3) The column of data plotted on your y-axis
-    // (4) The minimum value of your x-axis
-    // (5) The minimum value of your y-axis
-
-    // Returns an object with two points, where each point is an object with an x and y coordinate
-
-    function calcLinear(data, x, y, minX, maxX){
-      /////////
-      //SLOPE//
-      /////////
-
-      // Let n = the number of data points
       var n = data.length;
 
-      // Get just the points
       var pts = [];
       data.forEach(function(d,i){
         var obj = {};
@@ -185,10 +168,6 @@
         obj.xy = obj.x*obj.y;
         pts.push(obj);
       });
-
-			// Print the equation below the chart
-			//document.getElementsByClassName("DeathEquation").innerHTML = "y = " + m + "x + " + b;
-			//document.getElementsByClassName("equation")[1].innerHTML = "x = ( y - " + b + " ) / " + m;
 
       var xysum = 0;
       var xsum = 0;
@@ -206,6 +185,9 @@
 
       console.log(m)
       console.log(b)
+
+      output = document.getElementById(type);
+      output.innerHTML = "y = " +m.toFixed(3)+"x + "+b.toFixed(3);
 
       // return an object of two points
       // each point is an object with an x and y coordinate

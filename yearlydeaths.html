@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	<script src='https://unpkg.com/simple-statistics@5.4.0/dist/simple-statistics.min.js' />
+    <script src="yearlydeaths.js"></script>
+  </head>
+
+  <nav>
+  <ul role="banner" data-header>
+    <li><a href="./index.html">Home</a></li>
+    <li><a href="./deaths.html">Deaths per Storm</a></li>
+    <li><a href="./damage.html">Damage per Storm</a></li>
+    <li><a href="./yearlydeaths.html">Yearly Deaths</a></li>
+  </ul>
+</nav><br>
+
+
+  <div style="width: 100%; overflow: hidden;">
+    <div style="width: 600px; float: left;">
+    <h1 style="margin-left: 70px; text: Garamond;" class="text">Most Deaths per Storm Event</h1>
+    <div class="DeathChart"></div>
+		<div class="DeathEquation" style="color:green;"></div>
+  </div>
+    <div style="margin-top: 100px;">
+    </div>
+		<script src ="yearlydeaths.js"></script>
+  </div>
+
+</html>

@@ -1,88 +1,32 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
+  <head class="header">
     <link rel="stylesheet" href="style.css">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="deaths.js"></script>
   </head>
 
+  <nav>
+  <ul role="banner" data-header>
+    <li><a href="./index.html">Home</a></li>
+    <li><a href="./deaths.html">Deaths per Storm</a></li>
+    <li><a href="./damage.html">Damage per Storm</a></li>
+    <li><a href="./yearlydeaths.html">Yearly Deaths</a></li>
+  </ul>
+</nav><br>
 
-  <div style="width: 100%; overflow: hidden;">
-    <div style="width: 600px; float: left;">
-    <h1 style="margin-left: 70px; text: Garamond;" class="text">Most Deaths per Storm Event</h1>
-    <div class="DeathChart"></div>
-		<div class="DeathEquation"></div>
-		<div class="DeathOutlierEquation"></div>
-  </div>
-    <div style="margin-top: 100px;">
-      <p onclick="updateDeathCsv()" class="text">
-        <label>
-          <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
-          Tornado
-        </label><br>
-        <label>
-          <input type="checkbox" id="Thunderstorm" class ="DeathChecks" checked></input>
-          Thunderstorm
-        </label><br>
-        <label>
-          <input type="checkbox" id="Hail" class ="DeathChecks" checked></input>
-          Hail
-        </label><br>
-        <label>
-          <input type="checkbox" id="Winter Storm" class ="DeathChecks" checked></input>
-          Winter Storm
-        </label><br>
-        <label>
-          <input type="checkbox" id="High Wind" class ="DeathChecks" checked></input>
-          High Wind
-        </label><br>
-        <label>
-          <input type="checkbox" id="Wildfire" class ="DeathChecks" checked></input>
-          Wildfire
-        </label><br>
-        <label>
-          <input type="checkbox" id="Flood" class ="DeathChecks" checked></input>
-          Flood
-        </label><br>
-        <label>
-          <input type="checkbox" id="Drought" class ="DeathChecks" checked></input>
-          Drought
-        </label><br>
-        <label>
-          <input type="checkbox" id="Heat" class ="DeathChecks" checked></input>
-          Heat
-        </label><br>
-        <label>
-          <input type="checkbox" id="Tropical Storm" class ="DeathChecks" checked></input>
-          Tropical Storm
-        </label><br>
-        <label>
-          <input type="checkbox" id="Hurricane" class ="DeathChecks" checked></input>
-          Hurricane
-        </label><br>
-        <label>
-          <input type="checkbox" id="Tsunami" class ="DeathChecks" checked></input>
-          Tsunami
-        </label><br>
-        <label>
-          <input type="checkbox" id="Other" class ="DeathChecks" checked></input>
-          Other
-        </label><br>
+<h2>
+  Introduction
+</h2>
+<p>
+  Throughout the years temperature has been on the rise.
+  Along with this there has been speculation as to whether
+  the rising temperatures have caused the onset of more
+  severe storms. In this repository, we do deeper analysis
+  and explore whether this is true or not.
+</p>
 
-      </p>
-      <p onmouseup="updateDeathCsv()" class="text">
-        <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
-          <input type="range" min="0" max="500" value="15" id="deathSlider">
-          <div id="deathOutput"></div>
-        <form onclick="updateEquality()" action="">
-          <input name="equality" type="radio" class="equality" value=">" checked=true>>
-          <input name="equality" type="radio" class="equality" value="<"><
-        </form>
-        </div>
-      </p>
-    </div>
-		<script src ="deaths.js"></script>
-  </div>
+
 
 </html>

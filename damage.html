@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+  <head class="header">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="damage.js"></script>
+  </head>
+
+  <nav>
+  <ul role="banner" data-header>
+    <li><a href="./index.html">Home</a></li>
+    <li><a href="./deaths.html">Deaths per Storm</a></li>
+    <li><a href="./damage.html">Damage per Storm</a></li>
+    <li><a href="./yearlydeaths.html">Yearly Deaths</a></li>
+  </ul>
+</nav>
+
+
+  <div style="width: 100%; overflow: hidden;">
+    <div style="width: 600px; float: left;">
+    <h1 style="margin-left: 70px; text: Garamond;" class="text">Most Damage per Storm Event</h1>
+    <div class="DamageChart"></div>
+		<div id="DamageEquation" style="color:red;margin-left: 70px;margin-top:20px;"></div>
+		<div id="DamageOutlierEquation" style="color:green;margin-left: 70px;"></div>
+  </div>
+    <div style="margin-top: 100px;">
+      <p onclick="updateDamageCsv()" class="text">
+        <label>
+          <input type="checkbox" id="Tornado" class ="DamageChecks" checked></input>
+          Tornado
+        </label><br>
+        <label>
+          <input type="checkbox" id="Thunderstorm" class ="DamageChecks" checked></input>
+          Thunderstorm
+        </label><br>
+        <label>
+          <input type="checkbox" id="Hail" class ="DamageChecks" checked></input>
+          Hail
+        </label><br>
+        <label>
+          <input type="checkbox" id="Winter Storm" class ="DamageChecks" checked></input>
+          Winter Storm
+        </label><br>
+        <label>
+          <input type="checkbox" id="High Wind" class ="DamageChecks" checked></input>
+          High Wind
+        </label><br>
+        <label>
+          <input type="checkbox" id="Wildfire" class ="DamageChecks" checked></input>
+          Wildfire
+        </label><br>
+        <label>
+          <input type="checkbox" id="Flood" class ="DamageChecks" checked></input>
+          Flood
+        </label><br>
+        <label>
+          <input type="checkbox" id="Drought" class ="DamageChecks" checked></input>
+          Drought
+        </label><br>
+        <label>
+          <input type="checkbox" id="Heat" class ="DamageChecks" checked></input>
+          Heat
+        </label><br>
+        <label>
+          <input type="checkbox" id="Tropical Storm" class ="DamageChecks" checked></input>
+          Tropical Storm
+        </label><br>
+        <label>
+          <input type="checkbox" id="Hurricane" class ="DamageChecks" checked></input>
+          Hurricane
+        </label><br>
+        <label>
+          <input type="checkbox" id="Tsunami" class ="DamageChecks" checked></input>
+          Tsunami
+        </label><br>
+        <label>
+          <input type="checkbox" id="Other" class ="DamageChecks" checked></input>
+          Other
+        </label><br>
+
+      </p>
+      <p onmouseup="updateDamageCsv()" class="text">
+        <div class ="slidecontainer" onmouseup="updateDamageCsv()" onmousemove="updateSlider()">
+          <input type="range" min="0" max="3000000" value="10000000" id="damageSlider">
+          <div id="damageOutput"></div>
+        <form onclick="updateEquality()" action="">
+          <input name="equality" type="radio" class="equality" value=">" checked=true>>
+          <input name="equality" type="radio" class="equality" value="<"><
+        </form>
+        </div>
+      </p>
+    </div>
+		<script src ="damage.js"></script>
+  </div>
+
+</html>
