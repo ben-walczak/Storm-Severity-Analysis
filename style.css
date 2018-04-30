@@ -13,4 +13,30 @@
 				font-size: 13px;
 			}
 
+			.text text {
+				font-family: Garamond;
+			}
+			ul {
+			    list-style-type: none;
+			    margin: 0;
+			    padding: 0;
+			}
+
+			li {
+
+					float: left;
+			    display: inline;
+					background-color: black;
+			}
+			a {
+				color:white;
+    padding: 8px;
+    background-color: black;
+		text-decoration: none;
+}
+/* selected link */
+a:active {
+    color: green;
+}
+
 	</style>

@@ -107,7 +107,7 @@
 
           svg.append("text")
                 .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ -40 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+                .attr("transform", "translate("+ -55 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
                 .text("Deaths");
 
             svg.append("text")
@@ -122,6 +122,7 @@
 
 	  d3.tsv("deaths.tsv", types, function(error, data){
       data.forEach(function(d) {
+        d.DEATHS = parseInt(d.DEATHS);
         d.TAVG = parseFloat(d.TAVG);
       });
       deathData = data;

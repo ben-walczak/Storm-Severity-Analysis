@@ -1,6 +1,6 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 5, bottom: 50, left: 100},
+    var margin = {top: 5, right: 5, bottom: 50, left: 150},
 	     width = 450 - margin.left - margin.right,
 	     height = 450 - margin.top - margin.bottom;
 
@@ -108,7 +108,7 @@
 
           svg.append("text")
                 .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ -80 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+                .attr("transform", "translate("+ -100 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
                 .text("Damage");
 
             svg.append("text")
@@ -123,6 +123,7 @@
 
 	  d3.tsv("damage.tsv", types, function(error, data){
       data.forEach(function(d) {
+        d.DAMAGE_PROPERTY = parseFloat(d.DAMAGE_PROPERTY);
         d.TAVG = parseFloat(d.TAVG);
       });
       damageData = data;

@@ -23,16 +23,8 @@
     var equality;
 
     function updateDeathCsv() {
-      // .value = "on" is checked
-      // .id = weather event
-      SelectedWeatherEvents = []
 
-      //SelectedWeatherEvents = ["Tornado","Hurricane"];
-
-
-      y.domain(d3.extent(deathData, function(d) {
-            return d.DEATHS
-        }));
+      y.domain(d3.extent(deathData, function(d) {return d.DEATHS}));
       x.domain(d3.extent(deathData, function(d){ return d.YEAR}));
 
       // see below for an explanation of the calcLinear function
@@ -44,17 +36,15 @@
       return {
              YEAR: new Date(x),
              DEATHS: lin_s(+x)
-              };
-              });
-
-      //var lg = calcLinear(deathData, "x", "y", d3.min(deathData, function(d){ return d.TAVG}), d3.max(deathData, function(d){ return d.TAVG}));
-      ///var lg2 = calcLinear(outlierData, "x", "y", d3.min(deathData, function(d){ return d.TAVG}), d3.max(deathData, function(d){ return d.TAVG}));
+              };});
 
       svg.selectAll("*").remove();
+
       var color = d3.scaleSequential(d3.interpolateReds).domain(d3.extent(deathData, function(d) { return d.TAVG
         }));
         var size = d3.scaleLinear().domain(d3.extent(deathData, function(d) { return d.SUMEVENTS
         })).range([3, 9]);
+
       svg.selectAll(".point")
           .data(deathData)
           .enter().append("circle")
