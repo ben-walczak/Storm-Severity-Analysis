@@ -121,7 +121,7 @@
       damageOutput.innerHTML = "Damage "+equality+" "+damageSlider.value;
     };
 
-	  d3.tsv("damage.tsv", types, function(error, data){
+	  d3.tsv("data/damage.tsv", types, function(error, data){
       data.forEach(function(d) {
         d.DAMAGE_PROPERTY = parseFloat(d.DAMAGE_PROPERTY);
         d.TAVG = parseFloat(d.TAVG);

@@ -40,10 +40,20 @@
 
       svg.selectAll("*").remove();
 
-      var color = d3.scaleSequential(d3.interpolateReds).domain(d3.extent(deathData, function(d) { return d.TAVG
-        }));
-        var size = d3.scaleLinear().domain(d3.extent(deathData, function(d) { return d.SUMEVENTS
+      var color = d3.scaleSequential(d3.interpolateReds).domain([d3.min(deathData, function(d) { return d.TAVG }) - 1, d3.max(deathData, function(d) { return d.TAVG }) + 1]);
+      var size = d3.scaleLinear().domain(d3.extent(deathData, function(d) { return d.SUMEVENTS
         })).range([3, 9]);
+		
+	   svg.append("g")
+	   .attr("class", "legendSequential")
+	   .attr("transform", "translate(20,20)");
+	   var legendSequential = d3.legendColor()
+		.shapeWidth(30)
+		.cells(8)
+		.orient("vertical")
+		.scale(color) 
+	   svg.select(".legendSequential")
+       .call(legendSequential);
 
       svg.selectAll(".point")
           .data(deathData)
@@ -98,7 +108,7 @@
     };
 	  var parseDate = d3.timeParse("%Y");
       var formatDate = d3.timeFormat("%Y");
-	  d3.tsv("deaths_aggregated.tsv", types, function(error, data){
+	  d3.tsv("data/deaths_aggregated.tsv", types, function(error, data){
       data.forEach(function(d) {
             d.YEAR = parseDate(d.YEAR);
             d.DEATHS = parseInt(d.DEATHS);

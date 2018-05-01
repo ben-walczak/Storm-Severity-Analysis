@@ -120,7 +120,7 @@
       deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
     };
 
-	  d3.tsv("deaths.tsv", types, function(error, data){
+	  d3.tsv("data/deaths.tsv", types, function(error, data){
       data.forEach(function(d) {
         d.DEATHS = parseInt(d.DEATHS);
         d.TAVG = parseFloat(d.TAVG);
