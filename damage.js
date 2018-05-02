@@ -18,7 +18,7 @@
 
 
       var quantizeScale = d3.scaleQuantize()
-          .range(['green','purple','blue', 'orange', 'red']);
+          .range(['green','purple','blue', 'orange']);
 
 	  var xAxis = d3.axisBottom()
 	      .scale(x);
