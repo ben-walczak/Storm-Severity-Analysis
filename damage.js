@@ -1,6 +1,6 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 5, bottom: 50, left: 150},
+    var margin = {top: 5, right: 100, bottom: 50, left: 100},
 	     width = 800 - margin.left - margin.right,
 	     height = 450 - margin.top - margin.bottom;
 
@@ -82,7 +82,6 @@
           .style("opacity", "0.5")
           .style("fill", function(d){ return quantizeScale(d.DAMAGE_PROPERTY)});
 
-      console.log(quantizeScale(10000000));
       svg.append("line")
           .attr("class", "regression")
           .attr("x1", x(lg.ptA.x))
@@ -101,8 +100,6 @@
           .attr("stroke-width", 1)
           .attr("stroke", "green");
 
-
-
       svg.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
@@ -112,17 +109,32 @@
           .attr("class", "y axis")
           .call(yAxis);
 
+      svg.append("text")
+         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+         .attr("transform", "translate("+ -100 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+         .text("Damage");
 
+      svg.append("text")
+         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+         .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
+         .text("Average Temperature");
+		 
+      svg.append("g")
+	  .attr("class", "legendQuant")
+	  .attr("transform", "translate(530,250)");
 
-          svg.append("text")
-                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ -100 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-                .text("Damage");
+	  var legend = d3.legendColor()
+	  .labelFormat(d3.format(".2n"))
+	  .title("Color Legend")
+	  .titleWidth(100)
+	  .shape('circle')
+      .shapePadding(5)
+      .labelOffset(10)
+	  .scale(quantizeScale);
+	  console.log(quantizeScale.range())
 
-            svg.append("text")
-                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
-                .text("Average Temperature");
+	svg.select(".legendQuant")
+	  .call(legend);
     };
 
     function updateSlider() {
