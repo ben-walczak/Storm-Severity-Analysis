@@ -46,7 +46,7 @@
 		
 	   svg.append("g")
 	   .attr("class", "legendSequential")
-	   .attr("transform", "translate(650,30)");
+	   .attr("transform", "translate(650,15)");
 	   var legendSequential = d3.legendColor()
         .shape('circle')
 		.orient("vertical")
@@ -54,7 +54,7 @@
 		
 		svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate(610,80)")  // centre below axis
+        .attr("transform", "translate(610,65)")  // centre below axis
         .text("Celsius");
 
 	   svg.select(".legendSequential")
@@ -62,14 +62,18 @@
 
 	   svg.append("g")
 	   .attr("class", "legendSize")
-	   .attr("transform", "translate(200,10)");
+	   .attr("transform", "translate(650,175)");
+	   svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate(635,240)rotate(-90)")  // centre below axis
+        .text("Weather Events");
 
 	   var legendSize = d3.legendSize()
         .labelFormat(".0s")
         .shape('circle')
-        .shapePadding(20)
-        .labelOffset(20)
-		.orient("horizontal")
+        .shapePadding(10)
+        .labelOffset(10)
+		.orient("vertical")
 		.scale(size);
 
 	   svg.select(".legendSize")
@@ -119,7 +123,7 @@
 		mean = Math.round(d3.mean(deathData, function(d){ return d.TAVG}));
 		svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ 660 +","+(height-265)+")")  // centre below axis
+        .attr("transform", "translate("+ 660 +","+(height-280)+")")  // centre below axis
         .text("TAVG: " + mean + " C");
     };
 
