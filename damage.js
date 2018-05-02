@@ -1,7 +1,7 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
     var margin = {top: 5, right: 5, bottom: 50, left: 150},
-	     width = 450 - margin.left - margin.right,
+	     width = 800 - margin.left - margin.right,
 	     height = 450 - margin.top - margin.bottom;
 
 	  var svg = d3.select(".DamageChart").append("svg")
@@ -13,13 +13,17 @@
 	  var x = d3.scaleLinear()
 	      .range([0,width]);
 
-	  var y = d3.scaleLinear()
-	      .range([height,0]);
+	  var y = d3.scaleLog()
+	      .range([height,0]).base(2);
+
+
+      var quantizeScale = d3.scaleQuantize()
+          .range(['green','purple','blue', 'orange', 'red']);
 
 	  var xAxis = d3.axisBottom()
 	      .scale(x);
 
-	  var yAxis = d3.axisLeft()
+	  var yAxis = d3.axisLeft().tickFormat(d3.format(".3n"))
 	      .scale(y);
 
     var damageData;
@@ -54,9 +58,12 @@
       });
 
 
-      y.domain(d3.extent(UsedData, function(d){ return d.DAMAGE_PROPERTY}));
+      //y.domain(d3.extent(UsedData, function(d){ return d.DAMAGE_PROPERTY}));
+      y.domain([100, d3.max(UsedData, function(d){ return d.DAMAGE_PROPERTY})]);
       x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
-
+      quantizeScale.domain(d3.extent(UsedData, function(d){ return d.DAMAGE_PROPERTY}));
+        
+      y.clamp(true);
       var outlierData = getOutlierDataGivenEquality();
 
       var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DamageEquation");
@@ -72,9 +79,10 @@
           .attr("r", 3)
           .attr("cy", function(d){ return y(d.DAMAGE_PROPERTY); })
           .attr("cx", function(d){ return x(d.TAVG); })
-          .style("opacity", .5)
-          .style("fill", "blue");
+          .style("opacity", "0.5")
+          .style("fill", function(d){ return quantizeScale(d.DAMAGE_PROPERTY)});
 
+      console.log(quantizeScale(10000000));
       svg.append("line")
           .attr("class", "regression")
           .attr("x1", x(lg.ptA.x))

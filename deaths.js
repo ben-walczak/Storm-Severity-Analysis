@@ -1,7 +1,7 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
     var margin = {top: 5, right: 5, bottom: 50, left: 100},
-	     width = 450 - margin.left - margin.right,
+	     width = 800 - margin.left - margin.right,
 	     height = 450 - margin.top - margin.bottom;
 
 	  var svg = d3.select(".DeathChart").append("svg")
@@ -13,7 +13,7 @@
 	  var x = d3.scaleLinear()
 	      .range([0,width]);
 
-	  var y = d3.scaleLinear()
+	  var y = d3.scalePow().exponent(0.3)
 	      .range([height,0]);
 
 	  var xAxis = d3.axisBottom()

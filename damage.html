@@ -6,7 +6,13 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="damage.js"></script>
   </head>
-
+<style>
+  .checkboxes {
+      float:right;
+      width:100px;
+      margin-right:80px;
+  }
+</style>
   <nav>
   <ul role="banner" data-header>
     <li><a href="./index.html">Home</a></li>
@@ -24,7 +30,7 @@
 		<div id="DamageEquation" style="color:red;margin-left: 70px;margin-top:20px;"></div>
 		<div id="DamageOutlierEquation" style="color:green;margin-left: 70px;"></div>
   </div>
-    <div style="margin-top: 100px;">
+    <div class="checkboxes">
       <p onclick="updateDamageCsv()" class="text">
         <label>
           <input type="checkbox" id="Tornado" class ="DamageChecks" checked></input>

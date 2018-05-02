@@ -1,7 +1,7 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 5, bottom: 50, left: 100},
-	     width = 475 - margin.left - margin.right,
+    var margin = {top: 5, right: 100, bottom: 50, left: 100},
+	     width = 800 - margin.left - margin.right,
 	     height = 475 - margin.top - margin.bottom;
 
 	  var svg = d3.select(".DeathChart").append("svg")
@@ -46,14 +46,34 @@
 		
 	   svg.append("g")
 	   .attr("class", "legendSequential")
-	   .attr("transform", "translate(20,20)");
+	   .attr("transform", "translate(650,30)");
 	   var legendSequential = d3.legendColor()
-		.shapeWidth(30)
-		.cells(8)
+        .shape('circle')
 		.orient("vertical")
 		.scale(color) 
+		
+		svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate(610,80)")  // centre below axis
+        .text("Celsius");
+
 	   svg.select(".legendSequential")
        .call(legendSequential);
+
+	   svg.append("g")
+	   .attr("class", "legendSize")
+	   .attr("transform", "translate(200,10)");
+
+	   var legendSize = d3.legendSize()
+        .labelFormat(".0s")
+        .shape('circle')
+        .shapePadding(20)
+        .labelOffset(20)
+		.orient("horizontal")
+		.scale(size);
+
+	   svg.select(".legendSize")
+       .call(legendSize);
 
       svg.selectAll(".point")
           .data(deathData)
@@ -99,8 +119,8 @@
 		mean = Math.round(d3.mean(deathData, function(d){ return d.TAVG}));
 		svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ (width/2) +","+(height-180)+")")  // centre below axis
-        .text("Average Temperature: " + mean + " Celsius.");
+        .attr("transform", "translate("+ 660 +","+(height-265)+")")  // centre below axis
+        .text("TAVG: " + mean + " C");
     };
 
     function updateSlider() {

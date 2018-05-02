@@ -7,6 +7,13 @@
     <script src="deaths.js"></script>
   </head>
 
+<style>
+  .checkboxes {
+      float:right;
+      width:100px;
+      margin-right:80px;
+  }
+</style>
 
   <nav>
   <ul role="banner" data-header>
@@ -25,7 +32,7 @@
 		<div id="DeathEquation" style="color:red;margin-left: 70px;margin-top:20px;"></div>
 		<div id="DeathOutlierEquation" style="color:green;margin-left: 70px;"></div>
   </div>
-    <div style="margin-top: 100px;">
+    <div class="checkboxes">
       <p onclick="updateDeathCsv()" class="text">
         <label>
           <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
@@ -83,7 +90,7 @@
       </p>
       <p onmouseup="updateDeathCsv()" class="text">
         <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
-          <input type="range" min="0" max="500" value="250" id="deathSlider">
+          <input type="range" min="0" max="1000" value="100" id="deathSlider">
           <div id="deathOutput"></div>
         <form onclick="updateEquality()" action="">
           <input name="equality" type="radio" class="equality" value=">" checked=true>>
