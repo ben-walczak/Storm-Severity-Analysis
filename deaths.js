@@ -1,206 +1,230 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 5, bottom: 50, left: 100},
-	     width = 800 - margin.left - margin.right,
-	     height = 450 - margin.top - margin.bottom;
+// set margins for svg to fit screen well
+var margin = {top: 5, right: 5, bottom: 50, left: 100},
+  width = 800 - margin.left - margin.right,
+  height = 450 - margin.top - margin.bottom;
 
-	  var svg = d3.select(".DeathChart").append("svg")
-	      .attr("width", width + margin.left + margin.right)
-	      .attr("height", height + margin.top + margin.bottom)
-	    .append("g")
-	      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = d3.select(".DeathChart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	  var x = d3.scaleLinear()
-	      .range([0,width]);
+// set scales and axes of visualization
+var x = d3.scaleLinear()
+  .range([0,width]);
+var y = d3.scalePow().exponent(0.3)
+  .range([height,0]);
+var xAxis = d3.axisBottom()
+  .scale(x);
+var yAxis = d3.axisLeft()
+  .scale(y);
 
-	  var y = d3.scalePow().exponent(0.3)
-	      .range([height,0]);
+// set global variables
+var deathData;
+var deathThreshold;
+var equality;
 
-	  var xAxis = d3.axisBottom()
-	      .scale(x);
+// update visualization given interaction
+function updateDeathCsv() {
 
-	  var yAxis = d3.axisLeft()
-	      .scale(y);
+  // gather weather events selected
+  SelectedWeatherEvents = []
+  var checkboxes = document.getElementsByClassName("DeathChecks");
 
-    var deathData;
-    var deathThreshold;
-    var equality;
+  for (i= 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked == true)
+    SelectedWeatherEvents.push(checkboxes[i].id)
+  }
 
-    function updateDeathCsv() {
-      // .value = "on" is checked
-      // .id = weather event
-      SelectedWeatherEvents = []
+  // filter data according to weather events selected
+  filteredData = deathData.filter(function(element) {
+    return SelectedWeatherEvents.includes(element.EVENT_TYPE)
+  });
 
-      deathThreshold = deathSlider.value;
-      deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
+  // gather threshold for regression
+  deathThreshold = deathSlider.value;
+  deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
+  var radiobuttons = document.getElementsByClassName("equality");
 
-      var checkboxes = document.getElementsByClassName("DeathChecks");
-      var radiobuttons = document.getElementsByClassName("equality");
+  for (i= 0; i < radiobuttons.length; i++) {
+    if (radiobuttons[i].checked == true)
+    equality = radiobuttons[i].value;
+  }
 
-      for (i= 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked == true)
-            SelectedWeatherEvents.push(checkboxes[i].id)
-      }
+  // get axes domain or range
+  y.domain(d3.extent(filteredData, function(d){ return d.DEATHS}));
+  x.domain(d3.extent(filteredData, function(d){ return d.TAVG}));
 
-      for (i= 0; i < radiobuttons.length; i++) {
-        if (radiobuttons[i].checked == true)
-            equality = radiobuttons[i].value;
-      }
+  // get data within threshold for second linear regression
+  var ThresholdData = getThresholdDataGivenEquality();
 
-      //SelectedWeatherEvents = ["Tornado","Hurricane"];
-      UsedData = deathData.filter(function(element) {
-        return SelectedWeatherEvents.includes(element.EVENT_TYPE)
-      });
+  // calculate regression for all data points
+  var line = d3.line().x(function(d) { return x(d.TAVG); }).y(function(d) { return y(d.DEATHS); });
+  var regression_standard = ss.linearRegression(filteredData.map(function(d) {
+    return [+d.TAVG, d.DEATHS]; }));
+  var lin_s = ss.linearRegressionLine(regression_standard);
+  var lindata_standard = x.domain().map(function(x) {
+    return {
+      TAVG: parseFloat(x),
+      DEATHS: lin_s(+x)
+    };});
 
+  // calculate regression for data points within threshold
+  var line2 = d3.line().x(function(d) { return x(d.TAVG); }).y(function(d) { return y(d.DEATHS); });
+  var regression_standard2 = ss.linearRegression(ThresholdData.map(function(d) {
+    return [+d.TAVG, d.DEATHS]; }));
+  var lin_s2 = ss.linearRegressionLine(regression_standard2);
+  var lindata_standard2 = x.domain().map(function(x) {
+    return {
+      TAVG: parseFloat(x),
+      DEATHS: lin_s2(+x)
+    };});
 
-      y.domain(d3.extent(UsedData, function(d){ return d.DEATHS}));
-      x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
+  //  console.log(lindata_standard)
+  console.log(lindata_standard)
+  console.log(calculateLinearRegression(lindata_standard2))
 
-      var outlierData = getOutlierDataGivenEquality();
+  lg = calculateLinearRegression(lindata_standard)
+  lg2 = calculateLinearRegression(lindata_standard2)
 
-      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DeathEquation");
-      var lg2 = calcLinear(outlierData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DeathOutlierEquation");
-      console.log(lg2)
+  regression = document.getElementById("DeathEquation");
+  regression.innerHTML = "y = " +lg.slope.toFixed(3)+"x + "+lg.intercept.toFixed(3);
 
-      svg.selectAll("*").remove();
+  thresholdRegression = document.getElementById("DeathOutlierEquation");
+  thresholdRegression.innerHTML = "y = " +lg2.slope.toFixed(3)+"x + "+lg2.intercept.toFixed(3);
 
-      svg.selectAll(".point")
-          .data(UsedData)
-          .enter().append("circle")
-          .attr("class", "point")
-          .attr("r", 3)
-          .attr("cy", function(d){ return y(d.DEATHS); })
-          .attr("cx", function(d){ return x(d.TAVG); })
-          .style("opacity", .5)
-          .style("fill", "blue");
+  minPoint = minRegressionPoint(lindata_standard,lg);
+  minPoint2 = minRegressionPoint(lindata_standard2,lg2);
 
-      svg.append("line")
-          .attr("class", "regression")
-          .attr("x1", x(lg.ptA.x))
-          .attr("y1", y(lg.ptA.y))
-          .attr("x2", x(lg.ptB.x))
-          .attr("y2", y(lg.ptB.y))
-          .attr("stroke-width", 1)
-          .attr("stroke", "red");
+  console.log(minPoint)
+  console.log(minPoint2)
 
-      svg.append("line")
-          .attr("class", "regression")
-          .attr("x1", x(lg2.ptA.x))
-          .attr("y1", y(lg2.ptA.y))
-          .attr("x2", x(lg2.ptB.x))
-          .attr("y2", y(lg2.ptB.y))
-          .attr("stroke-width", 1)
-          .attr("stroke", "green");
+  lindata_standard[0].TAVG = minPoint.x;
+  lindata_standard[0].DEATHS = minPoint.y;
+  lindata_standard2[0].TAVG = minPoint2.x;
+  lindata_standard2[0].DEATHS = minPoint2.y;
 
+  // remove all svg elements
+  svg.selectAll("*").remove();
 
+  // draw all svg elements to screen
+  svg.selectAll(".point")
+    .data(filteredData)
+    .enter().append("circle")
+    .attr("class", "point")
+    .attr("r", 3)
+    .attr("cy", function(d){ return y(d.DEATHS); })
+    .attr("cx", function(d){ return x(d.TAVG); })
+    .style("opacity", .5)
+    .style("fill", "blue");
 
-      svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis)
+  svg.append("path")
+    .datum(lindata_standard)
+    .attr("class", "reg")
+    .attr("d", line)
+    .attr("stroke-width", 1)
+    .attr("stroke", "red");
 
-      svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis);
+  svg.append("path")
+    .datum(lindata_standard2)
+    .attr("class", "reg")
+    .attr("d", line2)
+    .attr("stroke-width", 1)
+    .attr("stroke", "green");
 
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
 
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
 
-          svg.append("text")
-                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ -55 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-                .text("Deaths");
+  svg.append("text")
+    .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+    .attr("transform", "translate("+ -55 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+    .text("Deaths");
 
-            svg.append("text")
-                .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-                .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
-                .text("Average Temperature");
+  svg.append("text")
+    .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+    .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
+    .text("Average Temperature");
+};
+
+// update slider text
+function updateSlider() {
+  deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
+};
+
+// get equality given equality chosen by radio button
+function updateEquality() {
+  var radiobuttons = document.getElementsByClassName("equality");
+  for (i= 0; i < radiobuttons.length; i++) {
+    if (radiobuttons[i].checked == true)
+    equality = radiobuttons[i].value;
+  }
+  updateDeathCsv();
+};
+
+// get threshold given the equality selected on screen
+function getThresholdDataGivenEquality() {
+  if (equality == ">")
+    return filteredData.filter(function(element) {return element.DEATHS >= deathThreshold});
+  else if (equality == "<") {
+    return filteredData.filter(function(element) {return element.DEATHS <= deathThreshold});
+  }
+};
+
+// read all data from tsv
+d3.tsv("data/deaths.tsv", types, function(error, data){
+  data.forEach(function(d) {
+    d.DEATHS = parseInt(d.DEATHS);
+    d.TAVG = parseFloat(d.TAVG);
+  });
+  deathData = data;
+  var deathSlider = document.getElementById("deathSlider");
+  var deathOutput = document.getElementById("deathOutput");
+  updateDeathCsv();
+});
+
+function types(d){
+  d.x = +d.TAVG;
+  d.y = +d.DEATHS;
+
+  return d;
+}
+
+function calculateLinearRegression(points) {
+  x1 = points[0].TAVG
+  y1 = points[0].DEATHS
+  x2 = points[1].TAVG
+  y2 = points[1].DEATHS
+
+  m = (y2-y1)/(x2-x1);
+  b = y1 - m*x1
+
+  return {
+    slope: m,
+    intercept: b
+  }
+}
+
+function minRegressionPoint(points, lg) {
+  if (points[0].DEATHS > 0) {
+    return {
+      x: points[0].TAVG,
+      y: points[0].DEATHS
     };
+  }
 
-    function updateSlider() {
-      deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
-    };
+  var y = 0;
+  var x = (y - lg.intercept)/lg.slope;
 
-	  d3.tsv("data/deaths.tsv", types, function(error, data){
-      data.forEach(function(d) {
-        d.DEATHS = parseInt(d.DEATHS);
-        d.TAVG = parseFloat(d.TAVG);
-      });
-      deathData = data;
-      var deathSlider = document.getElementById("deathSlider");
-      var deathOutput = document.getElementById("deathOutput");
-      updateDeathCsv();
-	  });
-
-    function getOutlierDataGivenEquality() {
-      if (equality == ">")
-        return UsedData.filter(function(element) {return element.DEATHS >= deathThreshold});
-      else if (equality == "<") {
-        return UsedData.filter(function(element) {return element.DEATHS <= deathThreshold});
-      }
-    };
-
-    function updateEquality() {
-      var radiobuttons = document.getElementsByClassName("equality");
-      for (i= 0; i < radiobuttons.length; i++) {
-        if (radiobuttons[i].checked == true)
-            equality = radiobuttons[i].value;
-      }
-      updateDeathCsv();
-    };
-
-
-
-	  function types(d){
-	    d.x = +d.TAVG;
-	    d.y = +d.DEATHS;
-
-	    return d;
-	  }
-
-    function calcLinear(data, x, y, minX, maxX, type){
-
-      var n = data.length;
-
-      var pts = [];
-      data.forEach(function(d,i){
-        var obj = {};
-        obj.x = d[x];
-        obj.y = d[y];
-        obj.xy = obj.x*obj.y;
-        pts.push(obj);
-      });
-
-      var xysum = 0;
-      var xsum = 0;
-      var ysum = 0;
-      var xsumSq = 0;
-      pts.forEach(function(pt){
-        xysum = xysum + pt.xy;
-        xsum = xsum + pt.x;
-        ysum = ysum + pt.y;
-        xsumSq = xsumSq + (pt.x * pt.x);
-      });
-
-      var m = (n*xysum - xsum*ysum)/(n*xsumSq - xsumSq);
-      var b = (ysum/n) - m*(xsum/n);
-
-      console.log(m)
-      console.log(b)
-
-      output = document.getElementById(type);
-      output.innerHTML = "y = " +m.toFixed(3)+"x + "+b.toFixed(3);
-
-      // return an object of two points
-      // each point is an object with an x and y coordinate
-      return {
-        ptA : {
-          x: minX,
-          y: m * minX + b
-        },
-        ptB : {
-          x: maxX,
-          y: m * maxX + b
-        }
-      }
-
-    }
+  return {
+    x: x,
+    y: 0
+  }
+}
