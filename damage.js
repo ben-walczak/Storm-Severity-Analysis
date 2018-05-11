@@ -1,222 +1,243 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 100, bottom: 50, left: 100},
-	     width = 800 - margin.left - margin.right,
-	     height = 450 - margin.top - margin.bottom;
+// set margins for svg to fit screen well
+var margin = {top: 5, right: 5, bottom: 50, left: 130},
+  width = 800 - margin.left - margin.right,
+  height = 450 - margin.top - margin.bottom;
 
-	  var svg = d3.select(".DamageChart").append("svg")
-	      .attr("width", width + margin.left + margin.right)
-	      .attr("height", height + margin.top + margin.bottom)
-	    .append("g")
-	      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svg = d3.select(".DamageChart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	  var x = d3.scaleLinear()
-	      .range([0,width]);
+// set scales and axes of visualization
+var x = d3.scaleLinear()
+  .range([0,width]);
+var y = d3.scalePow().exponent(0.3)
+  .range([height,0]);
+var xAxis = d3.axisBottom()
+  .scale(x);
+var yAxis = d3.axisLeft()
+  .scale(y);
 
-	  var y = d3.scaleLog()
-	      .range([height,0]).base(2);
+var quantizeScale = d3.scaleQuantize()
+  .range(['blue','purple','orange','green']);
 
+// set global variables
+var DamageData;
+var DamageThreshold;
+var equality;
 
-      var quantizeScale = d3.scaleQuantize()
-          .range(['green','purple','blue', 'orange']);
+// update visualization given interaction
+function updateDamageCsv() {
 
-	  var xAxis = d3.axisBottom()
-	      .scale(x);
+  // gather weather events selected
+  SelectedWeatherEvents = []
+  var checkboxes = document.getElementsByClassName("DamageChecks");
 
-	  var yAxis = d3.axisLeft().tickFormat(d3.format(".3n"))
-	      .scale(y);
+  for (i= 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked == true)
+    SelectedWeatherEvents.push(checkboxes[i].id)
+  }
 
-    var damageData;
-    var damageThreshold;
-    var equality;
+  // filter data according to weather events selected
+  filteredData = damageData.filter(function(element) {
+    return SelectedWeatherEvents.includes(element.EVENT_TYPE)
+  });
 
-    function updateDamageCsv() {
-      // .value = "on" is checked
-      // .id = weather event
+  // gather threshold for regression
+  DamageThreshold = damageSlider.value;
+  damageOutput.innerHTML = "Regression line of<br>data points with:<br>Damage "+equality+" "+damageSlider.value;
+  var radiobuttons = document.getElementsByClassName("equality");
 
-      SelectedWeatherEvents = []
+  for (i= 0; i < radiobuttons.length; i++) {
+    if (radiobuttons[i].checked == true)
+    equality = radiobuttons[i].value;
+  }
 
-      damageThreshold = damageSlider.value;
-      damageOutput.innerHTML = "Damage "+equality+" "+damageSlider.value;
+  // get axes domain or range
+  y.domain(d3.extent(filteredData, function(d){ return d.DAMAGE_PROPERTY}));
+  x.domain(d3.extent(filteredData, function(d){ return d.TAVG}));
+  quantizeScale.domain(d3.extent(filteredData, function(d){ return d.DAMAGE_PROPERTY}));
 
-      var checkboxes = document.getElementsByClassName("DamageChecks");
-      var radiobuttons = document.getElementsByClassName("equality");
+  // get data within threshold for second linear regression
+  var ThresholdData = getThresholdDataGivenEquality();
 
-      for (i= 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked == true)
-            SelectedWeatherEvents.push(checkboxes[i].id)
-      }
+  // calculate regression for all data points
+  var line = d3.line().x(function(d) { return x(d.TAVG); }).y(function(d) { return y(d.DAMAGE_PROPERTY); });
+  var regression_standard = ss.linearRegression(filteredData.map(function(d) {
+    return [+d.TAVG, d.DAMAGE_PROPERTY]; }));
+  var lin_s = ss.linearRegressionLine(regression_standard);
+  var lindata_standard = x.domain().map(function(x) {
+    return {
+      TAVG: parseFloat(x),
+      DAMAGE_PROPERTY: lin_s(+x)
+    };});
 
-      for (i= 0; i < radiobuttons.length; i++) {
-        if (radiobuttons[i].checked == true)
-            equality = radiobuttons[i].value;
-      }
+  // calculate regression for data points within threshold
+  var line2 = d3.line().x(function(d) { return x(d.TAVG); }).y(function(d) { return y(d.DAMAGE_PROPERTY); });
+  var regression_standard2 = ss.linearRegression(ThresholdData.map(function(d) {
+    return [+d.TAVG, d.DAMAGE_PROPERTY]; }));
+  var lin_s2 = ss.linearRegressionLine(regression_standard2);
+  var lindata_standard2 = x.domain().map(function(x) {
+    return {
+      TAVG: parseFloat(x),
+      DAMAGE_PROPERTY: lin_s2(+x)
+    };});
 
-      //SelectedWeatherEvents = ["Tornado","Hurricane"];
-      UsedData = damageData.filter(function(element) {
-        return SelectedWeatherEvents.includes(element.EVENT_TYPE)
-      });
+  lg = calculateLinearRegression(lindata_standard)
+  lg2 = calculateLinearRegression(lindata_standard2)
 
+  regression = document.getElementById("DamageEquation");
+  regression.innerHTML = "y = " +lg.slope.toFixed(3)+"x + "+lg.intercept.toFixed(3);
 
-      //y.domain(d3.extent(UsedData, function(d){ return d.DAMAGE_PROPERTY}));
-      y.domain([100, d3.max(UsedData, function(d){ return d.DAMAGE_PROPERTY})]);
-      x.domain(d3.extent(UsedData, function(d){ return d.TAVG}));
-      quantizeScale.domain(d3.extent(UsedData, function(d){ return d.DAMAGE_PROPERTY}));
-        
-      y.clamp(true);
-      var outlierData = getOutlierDataGivenEquality();
+  thresholdRegression = document.getElementById("DamageOutlierEquation");
+  thresholdRegression.innerHTML = "y = " +lg2.slope.toFixed(3)+"x + "+lg2.intercept.toFixed(3);
 
-      var lg = calcLinear(UsedData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DamageEquation");
-      var lg2 = calcLinear(outlierData, "x", "y", d3.min(UsedData, function(d){ return d.TAVG}), d3.max(UsedData, function(d){ return d.TAVG}), "DamageOutlierEquation");
-      console.log(lg2)
+  minPoint = minRegressionPoint(lindata_standard,lg);
+  minPoint2 = minRegressionPoint(lindata_standard2,lg2);
 
-      svg.selectAll("*").remove();
+  lindata_standard[0].TAVG = minPoint.x;
+  lindata_standard[0].DAMAGE_PROPERTY = minPoint.y;
+  lindata_standard2[0].TAVG = minPoint2.x;
+  lindata_standard2[0].DAMAGE_PROPERTY = minPoint2.y;
 
-      svg.selectAll(".point")
-          .data(UsedData)
-          .enter().append("circle")
-          .attr("class", "point")
-          .attr("r", 3)
-          .attr("cy", function(d){ return y(d.DAMAGE_PROPERTY); })
-          .attr("cx", function(d){ return x(d.TAVG); })
-          .style("opacity", "0.5")
-          .style("fill", function(d){ return quantizeScale(d.DAMAGE_PROPERTY)});
+  // remove all svg elements
+  svg.selectAll("*").remove();
 
-      svg.append("line")
-          .attr("class", "regression")
-          .attr("x1", x(lg.ptA.x))
-          .attr("y1", y(lg.ptA.y))
-          .attr("x2", x(lg.ptB.x))
-          .attr("y2", y(lg.ptB.y))
-          .attr("stroke-width", 1)
-          .attr("stroke", "red");
+  // draw all svg elements to screen
+  svg.selectAll(".point")
+    .data(filteredData)
+    .enter().append("circle")
+    .attr("class", "point")
+    .attr("r", 3)
+    .attr("cy", function(d){ return y(d.DAMAGE_PROPERTY); })
+    .attr("cx", function(d){ return x(d.TAVG); })
+    .style("opacity", .5)
+    .style("fill", function(d){ return quantizeScale(d.DAMAGE_PROPERTY)});
 
-      svg.append("line")
-          .attr("class", "regression")
-          .attr("x1", x(lg2.ptA.x))
-          .attr("y1", y(lg2.ptA.y))
-          .attr("x2", x(lg2.ptB.x))
-          .attr("y2", y(lg2.ptB.y))
-          .attr("stroke-width", 1)
-          .attr("stroke", "green");
+  svg.append("path")
+    .datum(lindata_standard)
+    .attr("class", "reg")
+    .attr("d", line)
+    .attr("stroke-width", 1)
+    .attr("stroke", "red");
 
-      svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis)
+  svg.append("path")
+    .datum(lindata_standard2)
+    .attr("class", "reg")
+    .attr("d", line2)
+    .attr("stroke-width", 1)
+    .attr("stroke", "green");
 
-      svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis);
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
 
-      svg.append("text")
-         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-         .attr("transform", "translate("+ -100 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-         .text("Damage");
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
 
-      svg.append("text")
-         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-         .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
-         .text("Average Temperature");
-		 
-      svg.append("g")
-	  .attr("class", "legendQuant")
-	  .attr("transform", "translate(530,250)");
+  svg.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ -100 +","+(height/2)+")rotate(-90)")
+    .text("Property Damage");
 
-	  var legend = d3.legendColor()
+  svg.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ (width/2) +","+(height+40)+")")
+    .text("Average Temperature");
+
+  svg.append("g")
+   	.attr("class", "legendQuant")
+   	.attr("transform", "translate(30,20)");
+
+  var legend = d3.legendColor()
 	  .labelFormat(d3.format(".2n"))
 	  .title("Color Legend")
 	  .titleWidth(100)
 	  .shape('circle')
-      .shapePadding(5)
-      .labelOffset(10)
+    .shapePadding(5)
+    .labelOffset(10)
 	  .scale(quantizeScale);
-	  console.log(quantizeScale.range())
 
 	svg.select(".legendQuant")
 	  .call(legend);
+};
+
+// update slider text
+function updateSlider() {
+  damageOutput.innerHTML = "Regression line of<br>data points with:<br>Damage "+equality+" "+DamageSlider.value;
+};
+
+// get equality given equality chosen by radio button
+function updateEquality() {
+  var radiobuttons = document.getElementsByClassName("equality");
+  for (i= 0; i < radiobuttons.length; i++) {
+    if (radiobuttons[i].checked == true)
+    equality = radiobuttons[i].value;
+  }
+  updateDamageCsv();
+};
+
+// get threshold given the equality selected on screen
+function getThresholdDataGivenEquality() {
+  if (equality == ">")
+    return filteredData.filter(function(element) {return element.DAMAGE_PROPERTY >= DamageThreshold});
+  else if (equality == "<") {
+    return filteredData.filter(function(element) {return element.DAMAGE_PROPERTY <= DamageThreshold});
+  }
+};
+
+// read all data from tsv
+d3.tsv("data/damage.tsv", types, function(error, data){
+  data.forEach(function(d) {
+    d.DAMAGE_PROPERTY = parseFloat(d.DAMAGE_PROPERTY);
+    d.TAVG = parseFloat(d.TAVG);
+  });
+  damageData = data;
+  var damageSlider = document.getElementById("damageSlider");
+  var damageOutput = document.getElementById("damageOutput");
+  updateDamageCsv();
+});
+
+function types(d){
+  d.x = +d.TAVG;
+  d.y = +d.DAMAGE_PROPERTY;
+
+  return d;
+}
+
+function calculateLinearRegression(points) {
+  x1 = points[0].TAVG
+  y1 = points[0].DAMAGE_PROPERTY
+  x2 = points[1].TAVG
+  y2 = points[1].DAMAGE_PROPERTY
+
+  m = (y2-y1)/(x2-x1);
+  b = y1 - m*x1
+
+  return {
+    slope: m,
+    intercept: b
+  }
+}
+
+function minRegressionPoint(points, lg) {
+  if (points[0].DAMAGE_PROPERTY > 0) {
+    return {
+      x: points[0].TAVG,
+      y: points[0].DAMAGE_PROPERTY
     };
+  }
 
-    function updateSlider() {
-      damageOutput.innerHTML = "Damage "+equality+" "+damageSlider.value;
-    };
+  var y = 0;
+  var x = (y - lg.intercept)/lg.slope;
 
-	  d3.tsv("data/damage.tsv", types, function(error, data){
-      data.forEach(function(d) {
-        d.DAMAGE_PROPERTY = parseFloat(d.DAMAGE_PROPERTY);
-        d.TAVG = parseFloat(d.TAVG);
-      });
-      damageData = data;
-      var damageSlider = document.getElementById("damageSlider");
-      var damageOutput = document.getElementById("damageOutput");
-      updateDamageCsv();
-	  });
-
-    function getOutlierDataGivenEquality() {
-      if (equality == ">")
-        return UsedData.filter(function(element) {return element.DAMAGE_PROPERTY >= damageThreshold});
-      else if (equality == "<") {
-        return UsedData.filter(function(element) {return element.DAMAGE_PROPERTY <= damageThreshold});
-      }
-    };
-
-    function updateEquality() {
-      var radiobuttons = document.getElementsByClassName("equality");
-      for (i= 0; i < radiobuttons.length; i++) {
-        if (radiobuttons[i].checked == true)
-            equality = radiobuttons[i].value;
-      }
-      updateDamageCsv();
-    };
-
-
-
-	  function types(d){
-	    d.x = +d.TAVG;
-	    d.y = +d.DAMAGE_PROPERTY;
-
-	    return d;
-	  }
-
-    function calcLinear(data, x, y, minX, maxX, type){
-
-      var n = data.length;
-
-      var pts = [];
-      data.forEach(function(d,i){
-        var obj = {};
-        obj.x = d[x];
-        obj.y = d[y];
-        obj.xy = obj.x*obj.y;
-        pts.push(obj);
-      });
-
-      var xysum = 0;
-      var xsum = 0;
-      var ysum = 0;
-      var xsumSq = 0;
-      pts.forEach(function(pt){
-        xysum = xysum + pt.xy;
-        xsum = xsum + pt.x;
-        ysum = ysum + pt.y;
-        xsumSq = xsumSq + (pt.x * pt.x);
-      });
-
-      var m = (n*xysum - xsum*ysum)/(n*xsumSq - xsumSq);
-      var b = (ysum/n) - m*(xsum/n);
-
-      output = document.getElementById(type);
-      output.innerHTML = "y = " +m.toFixed(3)+"x + "+b.toFixed(3);
-
-      return {
-        ptA : {
-          x: minX,
-          y: m * minX + b
-        },
-        ptB : {
-          x: maxX,
-          y: m * maxX + b
-        }
-      }
-
-    }
+  return {
+    x: x,
+    y: 0
+  }
+}

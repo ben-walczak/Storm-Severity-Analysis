@@ -45,7 +45,7 @@ function updateDeathCsv() {
 
   // gather threshold for regression
   deathThreshold = deathSlider.value;
-  deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
+  deathOutput.innerHTML = "Regression line of<br>data points with:<br>Deaths "+equality+" "+deathSlider.value;
   var radiobuttons = document.getElementsByClassName("equality");
 
   for (i= 0; i < radiobuttons.length; i++) {
@@ -82,10 +82,6 @@ function updateDeathCsv() {
       DEATHS: lin_s2(+x)
     };});
 
-  //  console.log(lindata_standard)
-  console.log(lindata_standard)
-  console.log(calculateLinearRegression(lindata_standard2))
-
   lg = calculateLinearRegression(lindata_standard)
   lg2 = calculateLinearRegression(lindata_standard2)
 
@@ -97,9 +93,6 @@ function updateDeathCsv() {
 
   minPoint = minRegressionPoint(lindata_standard,lg);
   minPoint2 = minRegressionPoint(lindata_standard2,lg2);
-
-  console.log(minPoint)
-  console.log(minPoint2)
 
   lindata_standard[0].TAVG = minPoint.x;
   lindata_standard[0].DEATHS = minPoint.y;
@@ -156,7 +149,7 @@ function updateDeathCsv() {
 
 // update slider text
 function updateSlider() {
-  deathOutput.innerHTML = "Deaths "+equality+" "+deathSlider.value;
+  deathOutput.innerHTML = "Regression line of<br>data points with:<br>Deaths "+equality+" "+deathSlider.value;
 };
 
 // get equality given equality chosen by radio button

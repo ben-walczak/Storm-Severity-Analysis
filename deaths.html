@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
 
-  <head class="header">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-	<script src="https://d3js.org/d3-color.v1.min.js"></script>
-    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-	<script src='https://unpkg.com/simple-statistics@5.4.0/dist/simple-statistics.min.js'></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
-    <script src="deaths.js"></script>
-  </head>
+<head class="header">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-color.v1.min.js"></script>
+  <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src='https://unpkg.com/simple-statistics@5.4.0/dist/simple-statistics.min.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+  <script src="deaths.js"></script>
+</head>
 
 <style>
-  .checkboxes {
-      float:right;
-      width:150px;
-      margin-right:400px;
-  }
+.checkboxes {
+  float:right;
+  width:150px;
+  margin-right:400px;
+}
 </style>
 
-  <nav>
+<nav>
   <ul role="banner" data-header>
     <li><a href="./index.html">Home</a></li>
     <li><a href="./deaths.html">Deaths per Storm</a></li>
@@ -30,81 +30,81 @@
 </nav>
 
 
-  <div style="width: 100%; overflow: hidden;">
-    <div style="width: 600px; float: left;">
+<div style="width: 100%; overflow: hidden;">
+  <div style="width: 600px; float: left;">
     <h1 style="margin-left: 70px; text: Garamond;" class="text">Most Deaths per Storm Event</h1>
     <div class="DeathChart"></div>
-		<div id="DeathEquation" style="color:red;margin-left: 70px;margin-top:20px;"></div>
-		<div id="DeathOutlierEquation" style="color:green;margin-left: 70px;"></div>
+    <div id="DeathEquation" style="color:red;margin-left: 70px;margin-top:20px;"></div>
+    <div id="DeathOutlierEquation" style="color:green;margin-left: 70px;"></div>
   </div>
-    <div class="checkboxes">
-      <p onclick="updateDeathCsv()" class="text">
-        <label>
-          <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
-          Tornado
-        </label><br>
-        <label>
-          <input type="checkbox" id="Thunderstorm" class ="DeathChecks" checked></input>
-          Thunderstorm
-        </label><br>
-        <label>
-          <input type="checkbox" id="Hail" class ="DeathChecks" checked></input>
-          Hail
-        </label><br>
-        <label>
-          <input type="checkbox" id="Winter Storm" class ="DeathChecks" checked></input>
-          Winter Storm
-        </label><br>
-        <label>
-          <input type="checkbox" id="High Wind" class ="DeathChecks" checked></input>
-          High Wind
-        </label><br>
-        <label>
-          <input type="checkbox" id="Wildfire" class ="DeathChecks" checked></input>
-          Wildfire
-        </label><br>
-        <label>
-          <input type="checkbox" id="Flood" class ="DeathChecks" checked></input>
-          Flood
-        </label><br>
-        <label>
-          <input type="checkbox" id="Drought" class ="DeathChecks" checked></input>
-          Drought
-        </label><br>
-        <label>
-          <input type="checkbox" id="Heat" class ="DeathChecks" checked></input>
-          Heat
-        </label><br>
-        <label>
-          <input type="checkbox" id="Tropical Storm" class ="DeathChecks" checked></input>
-          Tropical Storm
-        </label><br>
-        <label>
-          <input type="checkbox" id="Hurricane" class ="DeathChecks" checked></input>
-          Hurricane
-        </label><br>
-        <label>
-          <input type="checkbox" id="Tsunami" class ="DeathChecks" checked></input>
-          Tsunami
-        </label><br>
-        <label>
-          <input type="checkbox" id="Other" class ="DeathChecks" checked></input>
-          Other
-        </label><br>
+  <div class="checkboxes">
+    <p onclick="updateDeathCsv()" class="text">
+      <label>
+        <input type="checkbox" id="Tornado" class ="DeathChecks" checked></input>
+        Tornado
+      </label><br>
+      <label>
+        <input type="checkbox" id="Thunderstorm" class ="DeathChecks" checked></input>
+        Thunderstorm
+      </label><br>
+      <label>
+        <input type="checkbox" id="Hail" class ="DeathChecks" checked></input>
+        Hail
+      </label><br>
+      <label>
+        <input type="checkbox" id="Winter Storm" class ="DeathChecks" checked></input>
+        Winter Storm
+      </label><br>
+      <label>
+        <input type="checkbox" id="High Wind" class ="DeathChecks" checked></input>
+        High Wind
+      </label><br>
+      <label>
+        <input type="checkbox" id="Wildfire" class ="DeathChecks" checked></input>
+        Wildfire
+      </label><br>
+      <label>
+        <input type="checkbox" id="Flood" class ="DeathChecks" checked></input>
+        Flood
+      </label><br>
+      <label>
+        <input type="checkbox" id="Drought" class ="DeathChecks" checked></input>
+        Drought
+      </label><br>
+      <label>
+        <input type="checkbox" id="Heat" class ="DeathChecks" checked></input>
+        Heat
+      </label><br>
+      <label>
+        <input type="checkbox" id="Tropical Storm" class ="DeathChecks" checked></input>
+        Tropical Storm
+      </label><br>
+      <label>
+        <input type="checkbox" id="Hurricane" class ="DeathChecks" checked></input>
+        Hurricane
+      </label><br>
+      <label>
+        <input type="checkbox" id="Tsunami" class ="DeathChecks" checked></input>
+        Tsunami
+      </label><br>
+      <label>
+        <input type="checkbox" id="Other" class ="DeathChecks" checked></input>
+        Other
+      </label><br>
 
-      </p>
-      <p onmouseup="updateDeathCsv()" class="text">
-        <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
-          <input type="range" min="0" max="1000" value="100" id="deathSlider">
-          <div id="deathOutput"></div>
+    </p>
+    <p onmouseup="updateDeathCsv()" class="text">
+      <div class ="slidecontainer" onmouseup="updateDeathCsv()" onmousemove="updateSlider()">
+        <input type="range" min="0" max="1000" value="100" id="deathSlider">
+        <div id="deathOutput" style="color:green;"></div>
         <form onclick="updateEquality()" action="">
           <input name="equality" type="radio" class="equality" value=">" checked=true>>
           <input name="equality" type="radio" class="equality" value="<"><
         </form>
-        </div>
-      </p>
-    </div>
-		<script src ="deaths.js"></script>
+      </div>
+    </p>
   </div>
+  <script src ="deaths.js"></script>
+</div>
 
 </html>
