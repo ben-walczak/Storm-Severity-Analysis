@@ -1,6 +1,6 @@
 //https://bl.ocks.org/HarryStevens/be559bed98d662f69e68fc8a7e0ad097
 
-    var margin = {top: 5, right: 100, bottom: 50, left: 100},
+    var margin = {top: 15, right: 100, bottom: 50, left: 100},
 	     width = 800 - margin.left - margin.right,
 	     height = 475 - margin.top - margin.bottom;
 
@@ -42,7 +42,7 @@
 
       var color = d3.scaleSequential(d3.interpolateReds).domain([d3.min(deathData, function(d) { return d.TAVG }) - 1, d3.max(deathData, function(d) { return d.TAVG }) + 1]);
       var size = d3.scaleLinear().domain(d3.extent(deathData, function(d) { return d.SUMEVENTS
-        })).range([3, 9]);
+        })).range([4, 8]);
 		
 	   svg.append("g")
 	   .attr("class", "legendSequential")
