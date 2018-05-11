@@ -91,13 +91,22 @@ function updateDeathCsv() {
   thresholdRegression = document.getElementById("DeathOutlierEquation");
   thresholdRegression.innerHTML = "y = " +lg2.slope.toFixed(3)+"x + "+lg2.intercept.toFixed(3);
 
-  minPoint = minRegressionPoint(lindata_standard,lg);
-  minPoint2 = minRegressionPoint(lindata_standard2,lg2);
+  // Adjust regression line bounds to prevent crossing x-axis
+  pointBound = pointBounds(lindata_standard[0],lg);
+  pointBound2 = pointBounds(lindata_standard2[0],lg2);
 
-  lindata_standard[0].TAVG = minPoint.x;
-  lindata_standard[0].DEATHS = minPoint.y;
-  lindata_standard2[0].TAVG = minPoint2.x;
-  lindata_standard2[0].DEATHS = minPoint2.y;
+  lindata_standard[0].TAVG = pointBound.x;
+  lindata_standard[0].DEATHS = pointBound.y;
+  lindata_standard2[0].TAVG = pointBound2.x;
+  lindata_standard2[0].DEATHS = pointBound2.y;
+
+  pointBound = pointBounds(lindata_standard[1],lg);
+  pointBound2 = pointBounds(lindata_standard2[1],lg2);
+
+  lindata_standard[1].TAVG = pointBound.x;
+  lindata_standard[1].DEATHS = pointBound.y;
+  lindata_standard2[1].TAVG = pointBound2.x;
+  lindata_standard2[1].DEATHS = pointBound2.y;
 
   // remove all svg elements
   svg.selectAll("*").remove();
@@ -137,13 +146,13 @@ function updateDeathCsv() {
     .call(yAxis);
 
   svg.append("text")
-    .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-    .attr("transform", "translate("+ -55 +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ -55 +","+(height/2)+")rotate(-90)")
     .text("Deaths");
 
   svg.append("text")
-    .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-    .attr("transform", "translate("+ (width/2) +","+(height+40)+")")  // centre below axis
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ (width/2) +","+(height+40)+")")
     .text("Average Temperature");
 };
 
@@ -205,11 +214,11 @@ function calculateLinearRegression(points) {
   }
 }
 
-function minRegressionPoint(points, lg) {
-  if (points[0].DEATHS > 0) {
+function pointBounds(point, lg) {
+  if (parseFloat(point.DEATHS) > 0) {
     return {
-      x: points[0].TAVG,
-      y: points[0].DEATHS
+      x: point.TAVG,
+      y: point.DEATHS
     };
   }
 

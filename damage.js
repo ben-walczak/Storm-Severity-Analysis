@@ -95,13 +95,22 @@ function updateDamageCsv() {
   thresholdRegression = document.getElementById("DamageOutlierEquation");
   thresholdRegression.innerHTML = "y = " +lg2.slope.toFixed(3)+"x + "+lg2.intercept.toFixed(3);
 
-  minPoint = minRegressionPoint(lindata_standard,lg);
-  minPoint2 = minRegressionPoint(lindata_standard2,lg2);
+  pointBound = minRegressionPoint(lindata_standard[0],lg);
+  pointBound2 = minRegressionPoint(lindata_standard2[0],lg2);
 
-  lindata_standard[0].TAVG = minPoint.x;
-  lindata_standard[0].DAMAGE_PROPERTY = minPoint.y;
-  lindata_standard2[0].TAVG = minPoint2.x;
-  lindata_standard2[0].DAMAGE_PROPERTY = minPoint2.y;
+  // Adjust regression line bounds to prevent crossing x-axis
+  lindata_standard[0].TAVG = pointBound.x;
+  lindata_standard[0].DAMAGE_PROPERTY = pointBound.y;
+  lindata_standard2[0].TAVG = pointBound2.x;
+  lindata_standard2[0].DAMAGE_PROPERTY = pointBound2.y;
+
+  pointBound = minRegressionPoint(lindata_standard[1],lg);
+  pointBound2 = minRegressionPoint(lindata_standard2[1],lg2);
+
+  lindata_standard[1].TAVG = pointBound.x;
+  lindata_standard[1].DAMAGE_PROPERTY = pointBound.y;
+  lindata_standard2[1].TAVG = pointBound2.x;
+  lindata_standard2[1].DAMAGE_PROPERTY = pointBound2.y;
 
   // remove all svg elements
   svg.selectAll("*").remove();
@@ -225,11 +234,11 @@ function calculateLinearRegression(points) {
   }
 }
 
-function minRegressionPoint(points, lg) {
-  if (points[0].DAMAGE_PROPERTY > 0) {
+function minRegressionPoint(point, lg) {
+  if (point.DAMAGE_PROPERTY > 0) {
     return {
-      x: points[0].TAVG,
-      y: points[0].DAMAGE_PROPERTY
+      x: point.TAVG,
+      y: point.DAMAGE_PROPERTY
     };
   }
 
